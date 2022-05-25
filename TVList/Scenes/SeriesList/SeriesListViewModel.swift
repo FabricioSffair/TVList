@@ -13,13 +13,15 @@ protocol SeriesListDependencyInjectable {
     var seriesRepository: SeriesRepositoryObservable { get }
 }
 
-class SeriesListViewModel: ObservableObject {
+class SeriesListViewModel: SeriesListViewModelObservable {
     
     private let seriesRepository: SeriesRepositoryObservable
     private var subscribers = Set<AnyCancellable>()
     private var currentPage = 0
     private var hasMore = true
     
+    @Published var errorMessage: String = ""
+    @Published var showErrorMessage = false
     @Published var isLoading = false
     @Published var filteredSeries: [Series] = []
     @Published var searchText: String = "" {
@@ -50,8 +52,9 @@ class SeriesListViewModel: ObservableObject {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] error in
                 guard let self = self else { return }
+                self.errorMessage = "Unable to retrieve series. Please try again later"
+                self.showErrorMessage = true
                 self.isLoading = false
-                print(error)
             }
             .store(in: &subscribers)
     }

@@ -31,6 +31,10 @@ struct Series: Decodable, Identifiable, Equatable {
         
         let time: String
         let days: [String]
+        
+        func toString() -> String {
+            days.joined(separator: ", ") + " @ " + time 
+        }
     }
     
     struct Rating: Decodable, Equatable {
