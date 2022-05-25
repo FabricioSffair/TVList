@@ -24,7 +24,7 @@ struct Series: Decodable, Identifiable, Equatable {
     let rating: Rating
     let weight: Int
     let network: Network?
-    let image: SeriesImage
+    let image: SeriesImage?
     let summary: String?
     
     struct Schedule: Decodable, Equatable {
@@ -57,4 +57,10 @@ struct Series: Decodable, Identifiable, Equatable {
         let medium: String
         let original: String?
     }
+}
+
+
+struct SearchResult: Decodable {
+    let score: Double
+    let show: Series
 }

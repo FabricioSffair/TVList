@@ -18,8 +18,11 @@ class Dependencies {
 
 
 struct FakeProvider: SeriesPersisting {
+    func searchSeries(containing searchString: String) async throws -> [SearchResult] {
+        []
+    }
     
-    func getSeries(at page: Int, containing searchString: String) async throws -> [Series] {
+    func getSeries(at page: Int) async throws -> [Series] {
         []
     }
 }

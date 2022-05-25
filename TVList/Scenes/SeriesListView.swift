@@ -14,16 +14,19 @@ struct ContentView: View {
     var body: some View {
         NavigationView {
             List {
-                ForEach(viewModel.series.indices, id: \.self) { index in
-                    let serie = viewModel.series[index]
+                ForEach(viewModel.filteredSeries.indices, id: \.self) { index in
+                    let serie = viewModel.filteredSeries[index]
                     HStack {
-                        AsyncImage(url: URL(string: serie.image.medium)) { image in
+                        AsyncImage(url: URL(string: serie.image?.medium ?? "")) { image in
                             image
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
-                                .frame(maxHeight: 80)
+                                .frame(height: 80)
                         } placeholder: {
                             Image(systemName: "photo")
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(height: 80)
                         }
                         Text(serie.name)
                     }
@@ -42,6 +45,9 @@ struct ContentView: View {
             .navigationTitle("TVMaze Series")
         }
         .searchable(text: $viewModel.searchText, placement: .navigationBarDrawer(displayMode: .always))
+        .onSubmit(of: .search) {
+            viewModel.search()
+        }
     }
 }
 

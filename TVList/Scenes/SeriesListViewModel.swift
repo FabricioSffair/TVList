@@ -21,8 +21,14 @@ class SeriesListViewModel: ObservableObject {
     private var hasMore = true
     
     @Published var isLoading = false
-    @Published var searchText: String = ""
-    @Published var series: [Series] = [] 
+    @Published var filteredSeries: [Series] = []
+    @Published var searchText: String = "" {
+        didSet {
+            guard searchText.isEmpty else { return }
+            filteredSeries = series
+        }
+    }
+    private var series: [Series] = []
     
     init(dependencies: SeriesListDependencyInjectable = Dependencies.shared) {
         seriesRepository = dependencies.seriesRepository
@@ -32,7 +38,20 @@ class SeriesListViewModel: ObservableObject {
                 guard let self = self else { return }
                 self.isLoading = false
                 self.hasMore = series.count > 0
-                self.series = self.currentPage == 0 ? series : self.series + series
+                if self.searchText.isEmpty {
+                    self.series = self.currentPage == 0 ? series : self.series + series
+                    self.filteredSeries = self.series
+                } else {
+                    self.filteredSeries = series
+                }
+            }
+            .store(in: &subscribers)
+        seriesRepository.errorPublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] error in
+                guard let self = self else { return }
+                self.isLoading = false
+                print(error)
             }
             .store(in: &subscribers)
     }
@@ -50,9 +69,16 @@ class SeriesListViewModel: ObservableObject {
         getSeriesList()
     }
     
-    private func getSeriesList() {
+    func search() {
+        guard !isLoading else { return }
         isLoading = true
-        seriesRepository.getSeries(at: currentPage, containing: "")
+        seriesRepository.searchSeries(containing: searchText)
+    }
+    
+    private func getSeriesList() {
+        guard !isLoading else { return }
+        isLoading = true
+        seriesRepository.getSeries(at: currentPage)
     }
     
 }

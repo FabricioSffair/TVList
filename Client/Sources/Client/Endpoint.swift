@@ -10,6 +10,7 @@ import Foundation
 public enum Endpoint {
     
     case getSeries(Int)
+    case searchSeries(String)
     
     var timeout: Float { 3 }
     
@@ -21,6 +22,8 @@ public enum Endpoint {
         switch self {
         case .getSeries:
             return "/shows"
+        case .searchSeries:
+            return "/search/shows"
         }
     }
     
@@ -28,12 +31,14 @@ public enum Endpoint {
         switch self {
         case .getSeries(let page):
             return ["page": String(page)]
+        case .searchSeries(let search):
+            return ["q": search]
         }
     }
     
     private var httpMethod: HTTPMethod {
         switch self {
-        case .getSeries:
+        case .getSeries, .searchSeries:
             return .GET
         }
     }
