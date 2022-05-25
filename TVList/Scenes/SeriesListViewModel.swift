@@ -18,7 +18,10 @@ class SeriesListViewModel: ObservableObject {
     private let seriesRepository: SeriesRepositoryObservable
     private var subscribers = Set<AnyCancellable>()
     private var currentPage = 0
+    private var hasMore = true
     
+    @Published var isLoading = false
+    @Published var searchText: String = ""
     @Published var series: [Series] = [] 
     
     init(dependencies: SeriesListDependencyInjectable = Dependencies.shared) {
@@ -27,12 +30,18 @@ class SeriesListViewModel: ObservableObject {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] series in
                 guard let self = self else { return }
+                self.isLoading = false
+                self.hasMore = series.count > 0
                 self.series = self.currentPage == 0 ? series : self.series + series
             }
             .store(in: &subscribers)
     }
     
-    func loadMoreIfNeeded() {
+    func loadMoreIfNeeded(_ index: Int = 0) {
+        guard index >= series.count - 20, hasMore, !isLoading else {
+            return
+        }
+        currentPage += 1
         getSeriesList()
     }
     
@@ -42,11 +51,8 @@ class SeriesListViewModel: ObservableObject {
     }
     
     private func getSeriesList() {
+        isLoading = true
         seriesRepository.getSeries(at: currentPage, containing: "")
-    }
-    
-    @MainActor func updateSeries(with newSeries: [Series], isRefresh: Bool) {
-        series = isRefresh ? newSeries : series + newSeries
     }
     
 }

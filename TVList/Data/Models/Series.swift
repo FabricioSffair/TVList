@@ -54,7 +54,7 @@ struct Series: Decodable, Identifiable, Equatable {
     
     struct SeriesImage: Decodable, Equatable {
         
-        let medium: String?
+        let medium: String
         let original: String?
     }
 }
