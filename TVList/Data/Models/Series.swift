@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Series: Decodable, Identifiable {
+struct Series: Decodable, Identifiable, Equatable {
     
     let id: Int
     let url: String?
@@ -27,20 +27,20 @@ struct Series: Decodable, Identifiable {
     let image: SeriesImage
     let summary: String?
     
-    struct Schedule: Decodable {
+    struct Schedule: Decodable, Equatable {
         
         let time: String
         let days: [String]
     }
     
-    struct Rating: Decodable {
+    struct Rating: Decodable, Equatable {
         
         let average: Double?
     }
     
-    struct Network: Decodable {
+    struct Network: Decodable, Equatable {
         
-        struct Country: Decodable {
+        struct Country: Decodable, Equatable {
             let name: String
             let code: String
             let timezone: String?
@@ -52,7 +52,7 @@ struct Series: Decodable, Identifiable {
         let officialSite: String?
     }
     
-    struct SeriesImage: Decodable {
+    struct SeriesImage: Decodable, Equatable {
         
         let medium: String?
         let original: String?
