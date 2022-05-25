@@ -20,8 +20,13 @@ class ClientServiceTests: XCTestCase, MockProvider {
         sut = ClientService(clientRequester: mockClientRequester)
     }
     
+    override func tearDown() {
+        mockClientRequester = nil
+        sut = nil
+    }
     
     func testGetSeries() {
+        let getSeriesExpectation = expectation(description: "Get series async call returned")
         let mockedSeries = mockedSeries()
         mockClientRequester.response = mockedSeries
         let endpoint = Endpoint.getSeries(0)
@@ -31,10 +36,12 @@ class ClientServiceTests: XCTestCase, MockProvider {
                 let series = try await sut.getSeries(at: 0, containing: "asdf")
                 XCTAssertEqual(series, mockedSeries)
                 XCTAssertEqual(expectedURL, mockClientRequester.urlCalled)
+                getSeriesExpectation.fulfill()
             } catch {
                 XCTFail("Failed to call get series!")
             }
         }
+        wait(for: [getSeriesExpectation], timeout: 2.0)
     }
 
 }
