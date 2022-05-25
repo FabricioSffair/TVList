@@ -11,7 +11,8 @@ protocol SeriesPersisting: SeriesFetching, SeriesUpdating {}
 protocol SeriesUpdating { }
 
 protocol SeriesRepositoryOperations {
-    func getSeries(at page: Int, containing searchString: String)
+    func getSeries(at page: Int)
+    func searchSeries(containing searchString: String)
 }
 
 protocol SeriesRepositoryObservable: SeriesRepositoryOperations {
@@ -31,16 +32,27 @@ class SeriesRepository: SeriesRepositoryObservable {
         self.remote = remote
         self.localDatabase = localDatabase
         Task {
-            guard let series = try? await localDatabase.getSeries(at: 0, containing: "") else { return }
+            guard let series = try? await localDatabase.getSeries(at: 0) else { return }
             seriesPublisher.send(series)
         }
     }
     
-    func getSeries(at page: Int, containing searchString: String) {
+    func getSeries(at page: Int) {
         Task(priority: .background) {
             do {
-                let series = try await remote.getSeries(at: page, containing: searchString)
+                let series = try await remote.getSeries(at: page)
                 seriesPublisher.send(series)
+            } catch {
+                errorPublisher.send(error)
+            }
+        }
+    }
+    
+    func searchSeries(containing searchString: String) {
+        Task(priority: .background) {
+            do {
+                let searchResult = try await remote.searchSeries(containing: searchString)
+                seriesPublisher.send(searchResult.sorted(by: { $0.score > $1.score }).map({ $0.show }))
             } catch {
                 errorPublisher.send(error)
             }

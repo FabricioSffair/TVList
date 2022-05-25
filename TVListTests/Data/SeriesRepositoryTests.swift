@@ -36,12 +36,11 @@ class SeriesRepositoryTests: XCTestCase, MockProvider {
         sut.seriesPublisher.sink { series in
             XCTAssertEqual(series, mockedSeries)
             XCTAssertEqual(self.seriesFetching.pageCalled, pageCall)
-            XCTAssertEqual(self.seriesFetching.searchStringCalled, searchString)
             getStringsExpectation.fulfill()
         }
         .store(in: &subscribers)
         
-        sut.getSeries(at: pageCall, containing: searchString)
+        sut.getSeries(at: pageCall)
         wait(for: [getStringsExpectation], timeout: 2.0)
     }
 }
