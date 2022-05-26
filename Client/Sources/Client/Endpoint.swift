@@ -11,6 +11,7 @@ public enum Endpoint {
     
     case getSeries(Int)
     case searchSeries(String)
+    case getEpisodes(Int)
     
     var timeout: Float { 3 }
     
@@ -24,6 +25,8 @@ public enum Endpoint {
             return "/shows"
         case .searchSeries:
             return "/search/shows"
+        case .getEpisodes(let seriesId):
+            return "/shows/\(seriesId)/episodes"
         }
     }
     
@@ -33,12 +36,14 @@ public enum Endpoint {
             return ["page": String(page)]
         case .searchSeries(let search):
             return ["q": search]
+        case .getEpisodes:
+            return [:]
         }
     }
     
     private var httpMethod: HTTPMethod {
         switch self {
-        case .getSeries, .searchSeries:
+        case .getSeries, .searchSeries, .getEpisodes:
             return .GET
         }
     }

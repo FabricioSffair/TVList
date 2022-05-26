@@ -13,7 +13,7 @@ protocol SeriesListDependencyInjectable {
     var seriesRepository: SeriesRepositoryObservable { get }
 }
 
-class SeriesListViewModel: SeriesListViewModelObservable {
+final class SeriesListViewModel: SeriesListViewModelObservable {
     
     private let seriesRepository: SeriesRepositoryObservable
     private var subscribers = Set<AnyCancellable>()
@@ -52,11 +52,13 @@ class SeriesListViewModel: SeriesListViewModelObservable {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] error in
                 guard let self = self else { return }
+                guard error != nil else { return }
                 self.errorMessage = "Unable to retrieve series. Please try again later"
                 self.showErrorMessage = true
                 self.isLoading = false
             }
             .store(in: &subscribers)
+        refresh()
     }
     
     func loadMoreIfNeeded(_ index: Int = 0) {
@@ -82,6 +84,10 @@ class SeriesListViewModel: SeriesListViewModelObservable {
         guard !isLoading else { return }
         isLoading = true
         seriesRepository.getSeries(at: currentPage)
+    }
+    
+    func getDetailsDependencies() -> SeriesDetailDependencyInjectable {
+        return Dependencies.shared
     }
     
 }

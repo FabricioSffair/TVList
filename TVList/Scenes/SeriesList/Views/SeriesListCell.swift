@@ -14,19 +14,9 @@ struct SeriesListCell: View {
     var body: some View {
         GeometryReader { geoProxy in
             VStack(alignment: .leading, spacing: 6) {
-                AsyncImage(url: URL(string: serie.image?.medium ?? ""), content: { image in
-                    image
-                        .antialiased(true)
-                        .resizable()
-                        .scaledToFill()
-                        .frame(width: geoProxy.size.width, height: geoProxy.size.height * 2 / 3)
-                        .clipped()
-                        
-                }, placeholder: {
-                    Image(systemName: "photo")
-                        .resizable()
-                        .aspectRatio(1.0, contentMode: .fit)
-                })
+                SeriesImageView(image: serie.image?.medium)
+                    .frame(width: geoProxy.size.width, height: geoProxy.size.height * 2 / 3)
+                    .clipped()
 
                 SeriesListInfoView(
                     title: serie.name,
@@ -64,7 +54,7 @@ struct SeriesListCell_Previews: PreviewProvider {
                 rating: .init(average: 6.5),
                 weight: 5,
                 network: nil,
-                image: Series.SeriesImage.init(medium: "", original: nil),
+                image: SeriesImage.init(medium: "", original: nil),
                 summary: "Test summary"
             )
         )

@@ -13,6 +13,9 @@ final class MockSeriesFetching: SeriesFetching {
     var pageCalled: Int?
     var searchStringCalled: String?
     var seriesToReturn: [Series]?
+    var episodesToReturn: [Episode]?
+    var expectedSearchResult: [SearchResult]?
+    var seriesCalledGetEpisodes: Series?
     
     func getSeries(at page: Int) async throws -> [Series] {
         pageCalled = page
@@ -21,6 +24,11 @@ final class MockSeriesFetching: SeriesFetching {
     
     func searchSeries(containing searchString: String) async throws -> [SearchResult] {
         searchStringCalled = searchString
-        return [.init(score: 0.965, series: seriesToReturn!.first)]!
+        return expectedSearchResult!
+    }
+    
+    func getEpisodes(from series: Series) async throws -> [Episode] {
+        self.seriesCalledGetEpisodes = series
+        return episodesToReturn!
     }
 }

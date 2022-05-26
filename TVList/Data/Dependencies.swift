@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension Dependencies: SeriesListDependencyInjectable {}
+extension Dependencies: SeriesListDependencyInjectable, SeriesDetailDependencyInjectable {}
 
 class Dependencies {
     
@@ -18,6 +18,10 @@ class Dependencies {
 
 
 struct FakeProvider: SeriesPersisting {
+    func getEpisodes(from series: Series) async throws -> [Episode] {
+        []
+    }
+    
     func searchSeries(containing searchString: String) async throws -> [SearchResult] {
         []
     }

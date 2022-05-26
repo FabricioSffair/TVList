@@ -10,6 +10,7 @@ import Client
 protocol SeriesFetching {
     func getSeries(at page: Int) async throws -> [Series]
     func searchSeries(containing searchString: String) async throws -> [SearchResult]
+    func getEpisodes(from series: Series) async throws -> [Episode]
 }
 
 class ClientService: ClientServicable, SeriesFetching {
@@ -28,6 +29,12 @@ class ClientService: ClientServicable, SeriesFetching {
     
     func searchSeries(containing searchString: String) async throws -> [SearchResult] {
         let endpoint = Endpoint.searchSeries(searchString)
+        let req = endpoint.createClientRequest()
+        return try await clientRequester.request(req)
+    }
+    
+    func getEpisodes(from series: Series) async throws -> [Episode] {
+        let endpoint = Endpoint.getEpisodes(series.id)
         let req = endpoint.createClientRequest()
         return try await clientRequester.request(req)
     }

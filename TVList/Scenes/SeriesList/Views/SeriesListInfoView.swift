@@ -10,9 +10,9 @@ import SwiftUI
 struct SeriesListInfoView: View {
     
     let title: String
-    let rating: Series.Rating?
+    let rating: Rating?
     let summary: String?
-    let schedule: Series.Schedule?
+    let schedule: Schedule?
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -43,7 +43,7 @@ struct SeriesListInfoView: View {
 
 struct SeriesListInfoView_Previews: PreviewProvider {
     static var previews: some View {
-        SeriesListInfoView(title: "Squid Game", rating: .init(average: 6.5), summary: "Hundreds of cash-strapped contestants accept an invitation to compete in children's games for a tempting prize, but the stakes are deadly.", schedule: Series.Schedule.init(time: "22:00", days: ["Monday, Wednesday"]))
+        SeriesListInfoView(title: "Squid Game", rating: .init(average: 6.5), summary: "Hundreds of cash-strapped contestants accept an invitation to compete in children's games for a tempting prize, but the stakes are deadly.", schedule: Schedule.init(time: "22:00", days: ["Monday, Wednesday"]))
     }
 }
 

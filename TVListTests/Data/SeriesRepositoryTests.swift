@@ -30,7 +30,6 @@ class SeriesRepositoryTests: XCTestCase, MockProvider {
     func testCallGetSeries() throws {
         let getStringsExpectation = expectation(description: "Received series from getSeries publisher expectation")
         let pageCall = 4
-        let searchString = "Test"
         let mockedSeries = mockedSeries()
         seriesFetching.seriesToReturn = mockedSeries
         sut.seriesPublisher.sink { series in
@@ -41,6 +40,38 @@ class SeriesRepositoryTests: XCTestCase, MockProvider {
         .store(in: &subscribers)
         
         sut.getSeries(at: pageCall)
+        wait(for: [getStringsExpectation], timeout: 2.0)
+    }
+    
+    func testCallSearchSeries() throws {
+        let getStringsExpectation = expectation(description: "Received series from search series publisher expectation")
+        let searchString = "Test"
+        let mockedSeries = mockedSeries()
+        seriesFetching.expectedSearchResult = [.init(score: 0.965, show: mockedSeries.first!)]
+        sut.seriesPublisher.sink { series in
+            XCTAssertEqual(series, [mockedSeries.first!])
+            XCTAssertEqual(searchString, self.seriesFetching.searchStringCalled)
+            getStringsExpectation.fulfill()
+        }
+        .store(in: &subscribers)
+        
+        sut.searchSeries(containing: searchString)
+        wait(for: [getStringsExpectation], timeout: 2.0)
+    }
+    
+    func testCallGetEpisodes() throws {
+        let getStringsExpectation = expectation(description: "Received series from get episodes publisher expectation")
+        let mockedEpisodes = mockedEpisodes()
+        let series = mockedSeries().first!
+        seriesFetching.episodesToReturn = mockedEpisodes
+        sut.episodesPublisher.sink { episodes in
+            XCTAssertEqual(episodes, mockedEpisodes)
+            XCTAssertEqual(series, self.seriesFetching.seriesCalledGetEpisodes)
+            getStringsExpectation.fulfill()
+        }
+        .store(in: &subscribers)
+        
+        sut.getEpisodes(from: series)
         wait(for: [getStringsExpectation], timeout: 2.0)
     }
 }

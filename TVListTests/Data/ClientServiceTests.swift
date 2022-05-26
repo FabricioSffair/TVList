@@ -33,7 +33,7 @@ class ClientServiceTests: XCTestCase, MockProvider {
         let expectedURL = endpoint.createClientRequest().url
         Task {
             do {
-                let series = try await sut.getSeries(at: 0, containing: "asdf")
+                let series = try await sut.getSeries(at: 0)
                 XCTAssertEqual(series, mockedSeries)
                 XCTAssertEqual(expectedURL, mockClientRequester.urlCalled)
                 getSeriesExpectation.fulfill()

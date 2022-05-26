@@ -6,6 +6,7 @@
 //
 
 import Combine
+import Foundation
 
 protocol SeriesPersisting: SeriesFetching, SeriesUpdating {}
 protocol SeriesUpdating { }
@@ -13,17 +14,21 @@ protocol SeriesUpdating { }
 protocol SeriesRepositoryOperations {
     func getSeries(at page: Int)
     func searchSeries(containing searchString: String)
+    func getEpisodes(from series: Series)
 }
 
 protocol SeriesRepositoryObservable: SeriesRepositoryOperations {
     var errorPublisher: CurrentValueSubject<Error?, Never> { get }
     var seriesPublisher: PassthroughSubject<[Series], Never> { get }
+    var episodesPublisher: PassthroughSubject<[Episode], Never> { get }
 }
+
 
 class SeriesRepository: SeriesRepositoryObservable {
 
     private(set) var seriesPublisher: PassthroughSubject<[Series], Never> = .init()
     private(set) var errorPublisher: CurrentValueSubject<Error?, Never> = .init(nil)
+    private(set) var episodesPublisher: PassthroughSubject<[Episode], Never> = .init()
     
     var remote: SeriesFetching
     var localDatabase: SeriesPersisting
@@ -53,6 +58,17 @@ class SeriesRepository: SeriesRepositoryObservable {
             do {
                 let searchResult = try await remote.searchSeries(containing: searchString)
                 seriesPublisher.send(searchResult.sorted(by: { $0.score > $1.score }).map({ $0.show }))
+            } catch {
+                errorPublisher.send(error)
+            }
+        }
+    }
+    
+    func getEpisodes(from series: Series) {
+        Task(priority: .background) {
+            do {
+                let episodes = try await remote.getEpisodes(from: series)
+                episodesPublisher.send(episodes)
             } catch {
                 errorPublisher.send(error)
             }
